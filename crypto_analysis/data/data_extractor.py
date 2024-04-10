@@ -42,7 +42,7 @@ class DataExtractor:
         target_file = DataExtractor.point_to_specific_file(folder_path, file_name)
         last_modified = DataExtractor.check_last_modified_date(target_file)
         if (datetime.now() - last_modified) <= timedelta(days=7):
-            loadedcrypto_df_file = pd.read_csv(target_file)
+            crypto_df = pd.read_csv(target_file)
         else:
             r = requests.get(api_url)
             crypto_dict = r.json()
