@@ -30,7 +30,7 @@ class DataExtractor:
     def request_all_crypto_info(api_url: str = DEFAULT_CRYPTO_URL,
                                 folder_path: Union[Path, str] = DEFAULT_DATA_FOLDER,
                                 file_name: str = DEFAULT_INFO_FILE,
-                                save_file: bool = False) -> pd.DataFrame:
+                                save_file: bool = True) -> pd.DataFrame:
         """Get information general information for top 100 cryptos and store it in a pandas df.
 
         Args:
@@ -39,15 +39,17 @@ class DataExtractor:
         Returns:
             pd.DataFrame: Returns df with generic information on all available cryptos. 
         """
-        r = requests.get(api_url)
-        crypto_dict = r.json()
-        crypto_df = pd.DataFrame(crypto_dict)
-
-        if save_file:
-            target_file = DataExtractor.point_to_specific_file(folder_path, file_name)
-            last_modified = DataExtractor.check_last_modified_date(target_file)
-            if (datetime.now() - last_modified) > timedelta(days=7):
+        target_file = DataExtractor.point_to_specific_file(folder_path, file_name)
+        last_modified = DataExtractor.check_last_modified_date(target_file)
+        if (datetime.now() - last_modified) <= timedelta(days=7):
+            loadedcrypto_df_file = pd.read_csv(target_file)
+        else:
+            r = requests.get(api_url)
+            crypto_dict = r.json()
+            crypto_df = pd.DataFrame(crypto_dict)
+            if save_file:
                 crypto_df.to_csv(target_file, index=False)
+
         return crypto_df
 
     @staticmethod
@@ -71,13 +73,6 @@ class DataExtractor:
             last_modified_int = os.path.getmtime(file_path)
             last_modified = datetime.fromtimestamp(last_modified_int)
         return last_modified
-    
-    @staticmethod
-    def load_all_crypto_info(folder_path: Union[Path, str] = DEFAULT_DATA_FOLDER, 
-                             file_name: str = DEFAULT_INFO_FILE) -> pd.DataFrame:
-        target_file = DataExtractor.point_to_specific_file(folder_path, file_name)
-        loaded_file = pd.read_csv(target_file)
-        return loaded_file
         
     def get_last_3_months(self) -> pd.DataFrame:
         """Get latest three months OHLCV for the given crypto currency.
