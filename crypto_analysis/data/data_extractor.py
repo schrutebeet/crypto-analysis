@@ -55,6 +55,15 @@ class DataExtractor:
     @staticmethod
     def point_to_specific_file(folder_path: Union[Path, str] = DEFAULT_DATA_FOLDER, 
                           file_name: str = DEFAULT_INFO_FILE) -> Union[Path, str]:
+        """Get the full directory of a specific file.
+
+        Args:
+            folder_path (Union[Path, str], optional): Directory to a folder. Defaults to DEFAULT_DATA_FOLDER.
+            file_name (str, optional): File name. Defaults to DEFAULT_INFO_FILE.
+
+        Returns:
+            Union[Path, str]: Directory to the path.
+        """
         if isinstance(folder_path, Path):
             target_file = folder_path / Path(f"{file_name}.csv")
         else:
@@ -63,6 +72,18 @@ class DataExtractor:
 
     @staticmethod
     def check_last_modified_date(file_path: Union[Path, str], raise_error: bool = False) -> datetime:
+        """Check modification date of the specified file.
+
+        Args:
+            file_path (Union[Path, str]): Specified file path.
+            raise_error (bool, optional): Raise error if indicated. Defaults to False.
+
+        Raises:
+            FileNotFoundError: if 'raise_error' is True and file is not found, this error is raised.
+
+        Returns:
+            datetime: Time when the file was last modified.
+        """
         if not os.path.exists(file_path):
             directory, filename = os.path.split(file_path)
             if raise_error:
